@@ -9,15 +9,19 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    common_lib/association.cc \
     kalman_tracker/kalman_base.cc \
     main.cpp \
     mainwindow.cpp \
-    qcustomplot.cpp\
+    qcustomplot.cpp \
+    simple_tracker/simple_tracker.cc
 
 HEADERS += \
+    common_lib/association.h \
     kalman_tracker/kalman_base.h \
     mainwindow.h \
-    qcustomplot.h\
+    qcustomplot.h \
+    simple_tracker/simple_tracker.h
 
 FORMS += \
     mainwindow.ui
