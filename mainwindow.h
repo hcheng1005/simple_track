@@ -7,6 +7,8 @@
 
 #include "./simple_tracker/simple_tracker.h"
 
+typedef std::pair<std::pair<uint, uint>, double> cost_type;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -38,7 +40,8 @@ private:
 
 
 void compute_iou_distance(const std::vector<dets_t> dets_list, const std::vector<Eigen::VectorXd> trace_list, const std::string assign_mode);
-
+void greedy_test(std::vector<std::vector<cost_type>> &cost_matrix);
+bool myTestFunc(cost_type c1, cost_type c2);
 
 
 
