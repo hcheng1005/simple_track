@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     common_lib/association.cc \
+    common_lib/iou.cc \
     kalman_tracker/kalman_base.cc \
     main.cpp \
     mainwindow.cpp \

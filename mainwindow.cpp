@@ -9,19 +9,32 @@
 
 
 #include "common_lib/association.h"
+#include "common_lib/iou.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+
+        ui->setupUi(this);
+
+    QPen pen;
+    pen.setWidth(2);
+    pen.setStyle(Qt::PenStyle::SolidLine);
+    pen.setColor(Qt::darkGray);
+    ui->widget->addGraph();
+    ui->widget->graph(0)->setPen(pen);
+    ui->widget->graph(0)->setLineStyle(QCPGraph::lsNone);
+    ui->widget->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
+    ui->widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 
 
 void MainWindow::on_pushButton_released()
@@ -144,82 +157,51 @@ void creat_box_3d(std::vector<double> center_and_shape)
 
 void MainWindow::on_pushButton_2_released()
 {
+    // iou_test
+    iou2d_test();
+
+    GreedyTest_Main();
+}
+
+
+void MainWindow::iou2d_test(void)
+{
     //iou测试
-    proposal_type r1;
-    proposal_type r2;
+    rect_basic_struct r1;
+    rect_basic_struct r2;
 
-    double p1[4] = {2,3,2,4};
-    double half_wid, half_len;
+    r1.center_pos[0]= 2;
+    r1.center_pos[1] = 3;
+    r1.center_pos[2] = 1;
+    r1.box_len = 8;
+    r1.box_wid = 4;
+    r1.box_height = 2;
+    r1.heading = 0.2;
 
-    half_wid = 2;
-    half_len = 4;
+    r2.center_pos[0]= 3;
+    r2.center_pos[1] = 4;
+    r2.center_pos[2] = 0;
+    r2.box_len = 8;
+    r2.box_wid = 4;
+    r2.box_height = 2;
+    r2.heading = -0.2;
 
-    double theta = 0.2;
-    double rot[4] = {cos(theta), -1.0*sin(theta), sin(theta), cos(theta)};
-    theta = -0.2;
-    double rot2[4] = {cos(theta), -1.0*sin(theta), sin(theta), cos(theta)};
-
-    double temp_x, temp_y;
-
-    temp_x = -1.0 * half_wid;
-    temp_y =  half_len;
-    r1.x1 = rot[0] * temp_x + rot[1] * temp_y + p1[0];
-    r1.y1 = rot[2] * temp_x + rot[3] * temp_y + p1[1];
-
-    temp_x = half_wid;
-    temp_y = half_len;
-    r1.x2 = rot[0] * temp_x + rot[1] * temp_y + p1[0];
-    r1.y2 = rot[2] * temp_x + rot[3] * temp_y + p1[1];
-
-    temp_x = half_wid;
-    temp_y = -1.0 * half_len;
-    r1.x3 = rot[0] * temp_x + rot[1] * temp_y + p1[0];
-    r1.y3 = rot[2] * temp_x + rot[3] * temp_y + p1[1];
-
-    temp_x = -1.0 * half_wid;
-    temp_y = -1.0 * half_len;
-    r1.x4 = rot[0] * temp_x + rot[1] * temp_y + p1[0];
-    r1.y4 = rot[2] * temp_x + rot[3] * temp_y + p1[1];
-
-    double p2[4] = {3,4,2,4};
-
-    temp_x = -1.0 * half_wid;
-    temp_y =  half_len;
-    r2.x1 = rot2[0] * temp_x + rot2[1] * temp_y + p2[0];
-    r2.y1 = rot2[2] * temp_x + rot2[3] * temp_y + p2[1];
-
-    temp_x = half_wid;
-    temp_y = half_len;
-    r2.x2 = rot2[0] * temp_x + rot2[1] * temp_y + p2[0];
-    r2.y2 = rot2[2] * temp_x + rot2[3] * temp_y + p2[1];
-
-    temp_x = half_wid;
-    temp_y = -1.0 * half_len;
-    r2.x3 = rot2[0] * temp_x + rot2[1] * temp_y + p2[0];
-    r2.y3 = rot2[2] * temp_x + rot2[3] * temp_y + p2[1];
-
-    temp_x = -1.0 * half_wid;
-    temp_y = -1.0 * half_len;
-    r2.x4 = rot2[0] * temp_x + rot2[1] * temp_y + p2[0];
-    r2.y4 = rot2[2] * temp_x + rot2[3] * temp_y + p2[1];
-
-
-    std::cout << r1.x1 << "," << r1.y1 << std::endl;
-    std::cout << r1.x2 << "," << r1.y2 << std::endl;
-    std::cout << r1.x3 << "," << r1.y3 << std::endl;
-    std::cout << r1.x4 << "," << r1.y4 << std::endl;
-
-    std::cout << r2.x1 << "," << r2.y1 << std::endl;
-    std::cout << r2.x2 << "," << r2.y2 << std::endl;
-    std::cout << r2.x3 << "," << r2.y3 << std::endl;
-    std::cout << r2.x4 << "," << r2.y4 << std::endl;
-
-    double iou = IOU(r1, r2);
-
+    double iou = IOU_2D(r1, r2);
+    double giou = GIOU_2D(r1, r2);
+    double iou3d = IOU_3D(r1, r2);
+    double giou3d = GIOU_3D(r1, r2);
 
 
     std::cout << iou << std::endl;
+    std::cout << giou << std::endl;
 
+    std::cout << iou3d << std::endl;
+    std::cout << giou3d << std::endl;
+}
+
+
+void MainWindow::GreedyTest_Main(void)
+{
     double cost_c[10][10] = {
         1.74816487, 2.38917233, 1.71076069, 3.39056081 ,8.97918614 ,8.8463572,
          5.72492498, 3.51112043, 2.83719919, 1.47646523, 6.90482939 ,6.54823362,
@@ -259,7 +241,6 @@ void MainWindow::on_pushButton_2_released()
        }
 
        greedy_test(cost_matrix);
-
 }
 
 
@@ -294,7 +275,7 @@ void greedy_test(std::vector<std::vector<cost_type>> &cost_matrix)
         }
     }
 
-#if 1
+#if 0
     double total_cost = 0.0;
     for(uint idx=0; idx<trace_assign_info.size(); idx++)
     {
@@ -305,10 +286,8 @@ void greedy_test(std::vector<std::vector<cost_type>> &cost_matrix)
     }
 
     std::cout << "total is: " << std::to_string(total_cost) << std::endl;
-
 #endif
 
-    std::cout << "end" << std::endl;
 }
 
 

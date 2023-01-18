@@ -21,7 +21,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void iou2d_test(void);
 
+    void GreedyTest_Main(void);
     void simple_trace_proc(std::vector<dets_t> &dets_list);
 
 private slots:
