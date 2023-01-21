@@ -294,8 +294,6 @@ double compute_convexHullArea(const rect_corners_struct &r1, const rect_corners_
     }
     double ares_ = PolygonArea(ppp, num_);
 
-//    std::cout << std::to_string(ares_) << std::endl;
-
     return ares_;
 }
 

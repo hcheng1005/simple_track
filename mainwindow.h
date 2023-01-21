@@ -6,8 +6,8 @@
 
 
 #include "./simple_tracker/simple_tracker.h"
-
-typedef std::pair<std::pair<uint, uint>, double> cost_type;
+#include "common_lib/association.h"
+#include "common_lib/iou.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,17 +33,26 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    Linear_Assigment *LA_solver;
+
+    void mySleep(uint32_t ms);
+
+    void lap_main(std::vector<std::vector<cost_pair>> cost_matrix,
+                  std::vector<simple_tracker> trace_list,
+                  std::vector<dets_t> dets_list);
+
+    void simple_demo();
+    void simple_demo_get_dets(const QString filePath, std::vector<dets_t> &dets_list);
+    void simple_demo_plot(const std::vector<dets_t> &dets_list, const std::vector<simple_tracker> &trace_list);
+    void simple_demo_plot_add_det_rect(const rect_basic_struct &rect, QString plot_obj);
 };
 
 
-
-
-
-
-
-void compute_iou_distance(const std::vector<dets_t> dets_list, const std::vector<Eigen::VectorXd> trace_list, const std::string assign_mode);
-void greedy_test(std::vector<std::vector<cost_type>> &cost_matrix);
-bool myTestFunc(cost_type c1, cost_type c2);
+void compute_iou_distance(const std::vector<dets_t> dets_list,
+                          const std::vector<Eigen::VectorXd> trace_list,
+                          const std::string assign_mode,
+                          std::vector<std::vector<cost_pair> > &cost_matrix);
 
 
 
