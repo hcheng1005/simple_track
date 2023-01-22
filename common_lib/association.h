@@ -93,6 +93,8 @@ public:
 
     int lapjv_internal(const uint_t n, cost_t *cost[], int_t *x, int_t *y);
 
+    void auction(int N, double **cost, std::vector<int>& assignment);
+
 private:
     // Computes the optimal assignment (minimum overall costs) using Munkres algorithm.
     void assignmentoptimal(assignments_t& assignment, track_t& cost, const distMatrix_t& distMatrixIn, size_t nOfRows, size_t nOfColumns);
@@ -133,6 +135,16 @@ private:
         const uint_t n, cost_t *cost[],
         const uint_t n_free_rows,
         int_t *free_rows, int_t *x, int_t *y, cost_t *v);
+
+
+    #define INF std::numeric_limits<int>::max()
+    #define VERBOSE false
+
+    /* Pre-declare functions to allow arbitrary call ordering  */
+    void auctionRound(std::vector<int>* assignment, std::vector<double>* prices, std::vector<double>* C, double epsilon);
+    std::vector<int> getIndicesWithVal(std::vector<int>* v, int val);
+    std::vector<int> makeRandC(int size);
+    void reset(std::vector<int>* v, int val);
 };
 
 

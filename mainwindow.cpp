@@ -11,6 +11,8 @@
 #include "common_lib/association.h"
 #include "common_lib/iou.h"
 
+#include <sys/time.h>
+
 /* simple trace vari */
 std::vector<simple_tracker> trace_list;
 
@@ -362,17 +364,17 @@ void MainWindow::lap_main(std::vector<std::vector<cost_pair>> cost_matrix,
               std::vector<dets_t> dets_list)
 {
     distMatrix_t distMatrix;
-    std::vector<int> assignment;
+    std::vector<int> assignment, assignment2;
 
     uint max_num_ = (trace_list.size() > dets_list.size())? trace_list.size() : dets_list.size();
-//    double **cost_ptr = new double *[sizeof(double *) * max_num_];
-//    int x_c[max_num_];
-//    int y_c[max_num_];
+    double **cost_ptr = new double *[sizeof(double *) * max_num_];
+    double **cost_ptr2 = new double *[sizeof(double *) * max_num_];
 
-//    for (uint i = 0; i < max_num_; i++)
-//    {
-//        cost_ptr[i] = new double[sizeof(double) * max_num_];
-//    }
+    for (uint i = 0; i < max_num_; i++)
+    {
+        cost_ptr[i] = new double[sizeof(double) * max_num_];
+        cost_ptr2[i] = new double[sizeof(double) * max_num_];
+    }
 
     for (uint i1 = 0; i1 < max_num_; i1++)
     {
@@ -380,30 +382,49 @@ void MainWindow::lap_main(std::vector<std::vector<cost_pair>> cost_matrix,
         {
             if( (i1 < trace_list.size()) && (i2 < dets_list.size()))
             {
-                std::cout<< cost_matrix.at(i1).at(i2).second << "," << std::endl;
-//                cost_ptr[i1][i2] = cost_matrix.at(i1).at(i2).second;
-                distMatrix.push_back(cost_matrix.at(i1).at(i2).second * -1.0);
+                cost_ptr[i1][i2] = (cost_matrix.at(i1).at(i2).second + 1.0) * -1.0;
+                distMatrix.push_back((cost_matrix.at(i1).at(i2).second + 1.0) * -1.0);
+                cost_ptr2[i1][i2] = (cost_matrix.at(i1).at(i2).second + 1.0);
             }
             else
             {
-//                cost_ptr[i1][i2] = 1e3;
+                cost_ptr[i1][i2] = 1e3;
+                cost_ptr2[i1][i2] = -1.0*1e3;
 //                distMatrix.push_back(1e3);
             }
         }
     }
 
+    int trace_assign_c[max_num_];
+    int det_assign_c[max_num_];
+    struct timeval timestamp, timestamp2,timestamp3,timestamp4;
+
     if((trace_list.size() > 0) && (dets_list.size() > 0))
     {
-        LA_solver->Hungarian_solver(distMatrix, trace_list.size(), dets_list.size(), assignment, LA_solver->optimal);
-//        LA_solver->lapjv_internal(max_num_, cost_ptr, &x_c[0], &y_c[0]);
+        gettimeofday(&timestamp, NULL);
+        LA_solver->Hungarian_solver(distMatrix, dets_list.size(), trace_list.size(), assignment, LA_solver->optimal);
+
+        gettimeofday(&timestamp2, NULL);
+        LA_solver->lapjv_internal(max_num_, cost_ptr, &trace_assign_c[0], &det_assign_c[0]);
+
+        gettimeofday(&timestamp3, NULL);
+        LA_solver->auction(max_num_, cost_ptr2, assignment2);
+
+        gettimeofday(&timestamp4, NULL);
+
+        std::cout << timestamp2.tv_usec - timestamp.tv_usec  << "  " \
+                  << timestamp3.tv_usec - timestamp2.tv_usec << " " \
+                  << timestamp4.tv_usec - timestamp3.tv_usec << " " <<  std::endl;
     }
 
-//    for(uint i=0; i<max_num_; i++)
-//    {
-//        delete[] cost_ptr[i];
-//    }
+    for(uint i=0; i<max_num_; i++)
+    {
+        delete[] cost_ptr[i];
+        delete[] cost_ptr2[i];
+    }
 
-//    delete[] cost_ptr;
+    delete[] cost_ptr;
+    delete[] cost_ptr2;
 
     std::cout << "xx" << std::endl;
 }
